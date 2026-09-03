@@ -160,8 +160,20 @@ jobs:
           java-version: "21"
           cache: maven
 
+      # Cache de la base de datos NVD para no re-descargarla en cada corrida
+      - name: Cache de la BD de NVD
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository/org/owasp/dependency-check-data
+          key: ${{ runner.os }}-nvd-${{ hashFiles('pom.xml') }}
+          restore-keys: ${{ runner.os }}-nvd-
+
+      # OWASP Dependency-Check v13 requiere una API key de NVD (gratuita)
       - name: OWASP Dependency-Check
-        run: mvn -B org.owasp:dependency-check-maven:check -DfailBuildOnCVSS=8
+        run: >
+          mvn -B org.owasp:dependency-check-maven:check
+          -DfailBuildOnCVSS=8
+          -DnvdApiKey=${{ secrets.NVD_API_KEY }}
 
       - name: Subir reporte OWASP (HTML)
         if: always()
