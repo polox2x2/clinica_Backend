@@ -57,7 +57,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Configurar JDK 21 (temurin) con cache de Maven
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: "21"
@@ -105,7 +105,7 @@ jobs:
           fetch-depth: 0 # Sonar necesita el historial para 'codigo nuevo'
 
       - name: Configurar JDK 21 (temurin) con cache de Maven
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: "21"
@@ -149,7 +149,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Configurar JDK 21 (temurin) con cache de Maven
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: "21"
