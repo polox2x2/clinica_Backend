@@ -32,7 +32,7 @@ jobs:
       contents: read
     steps:
       - name: Checkout con historial completo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
@@ -54,7 +54,7 @@ jobs:
       pull-requests: write # madrapps/jacoco-report comenta cobertura en el PR
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Configurar JDK 21 (temurin) con cache de Maven
         uses: actions/setup-java@v4
@@ -100,7 +100,7 @@ jobs:
       contents: read
     steps:
       - name: Checkout con historial completo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0 # Sonar necesita el historial para 'codigo nuevo'
 
@@ -146,7 +146,7 @@ jobs:
       contents: read
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Configurar JDK 21 (temurin) con cache de Maven
         uses: actions/setup-java@v4
@@ -181,7 +181,7 @@ jobs:
       IMAGEN: ghcr.io/${{ github.repository }}/medicitas-api
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Configurar Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -237,7 +237,7 @@ jobs:
       IMAGEN: ghcr.io/${{ github.repository }}/medicitas-api
     steps:
       - name: Checkout (2 commits para resolver HEAD~1)
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 2
 
