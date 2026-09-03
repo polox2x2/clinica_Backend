@@ -77,7 +77,9 @@ jobs:
         if: always()
         with:
           name: Reporte de pruebas
-          path: "target/surefire-reports/*.xml,target/failsafe-reports/*.xml"
+          # Solo los TEST-*.xml (JUnit). Se excluye failsafe-summary.xml, que tiene
+          # otro esquema y hace crashear al parser (reading '$').
+          path: "target/surefire-reports/TEST-*.xml,target/failsafe-reports/TEST-*.xml"
           reporter: java-junit
           fail-on-error: false    # el reporte es informativo: nunca debe tumbar el build
 
