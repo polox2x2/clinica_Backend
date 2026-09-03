@@ -1,7 +1,7 @@
 # ============================================================================
 # Stage 1: build — compila, empaqueta el jar y crea un JRE minimo con jlink
 # ============================================================================
-FROM maven:3.9-eclipse-temurin-21-alpine AS build
+FROM maven:3-eclipse-temurin-26-alpine AS build
 WORKDIR /app
 
 # Copiamos primero solo el pom para cachear las dependencias en su propia capa:
@@ -23,7 +23,7 @@ RUN jlink \
 # ============================================================================
 # Stage 2: runtime — alpine minimo + JRE recortado + jar
 # ============================================================================
-FROM alpine:3.21 AS runtime
+FROM alpine:3.24 AS runtime
 WORKDIR /app
 
 # wget para el HEALTHCHECK; el JRE de jlink (temurin/musl) corre sobre alpine sin mas libs
