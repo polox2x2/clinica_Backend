@@ -23,7 +23,7 @@ RUN jlink \
 # ============================================================================
 # Stage 2: runtime — alpine minimo + JRE recortado + jar
 # ============================================================================
-FROM alpine:3.21 AS runtime
+FROM alpine:3.24 AS runtime
 WORKDIR /app
 
 # wget para el HEALTHCHECK; el JRE de jlink (temurin/musl) corre sobre alpine sin mas libs
