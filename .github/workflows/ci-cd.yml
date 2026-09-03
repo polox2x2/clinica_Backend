@@ -32,12 +32,12 @@ jobs:
       contents: read
     steps:
       - name: Checkout con historial completo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
       - name: Escaneo de secretos con Gitleaks
-        uses: gitleaks/gitleaks-action@v2
+        uses: gitleaks/gitleaks-action@v3
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -54,10 +54,10 @@ jobs:
       pull-requests: write # madrapps/jacoco-report comenta cobertura en el PR
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Configurar JDK 21 (temurin) con cache de Maven
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: "21"
@@ -73,7 +73,7 @@ jobs:
         run: mvn -B verify -Pintegration
 
       - name: Publicar reporte de pruebas
-        uses: dorny/test-reporter@v2
+        uses: dorny/test-reporter@v3
         if: always()
         with:
           name: Reporte de pruebas
@@ -85,7 +85,7 @@ jobs:
 
       - name: Comentar cobertura en el PR
         if: github.event_name == 'pull_request'
-        uses: madrapps/jacoco-report@v1.7.1
+        uses: madrapps/jacoco-report@v1.8.0
         with:
           paths: ${{ github.workspace }}/target/site/jacoco/jacoco.xml
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -105,19 +105,19 @@ jobs:
       contents: read
     steps:
       - name: Checkout con historial completo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0 # Sonar necesita el historial para 'codigo nuevo'
 
       - name: Configurar JDK 21 (temurin) con cache de Maven
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: "21"
           cache: maven
 
       - name: Cache de SonarQube
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ~/.sonar/cache
           key: ${{ runner.os }}-sonar
@@ -151,10 +151,10 @@ jobs:
       contents: read
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Configurar JDK 21 (temurin) con cache de Maven
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: "21"
@@ -162,7 +162,7 @@ jobs:
 
       # Cache de la base de datos NVD para no re-descargarla en cada corrida
       - name: Cache de la BD de NVD
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ~/.m2/repository/org/owasp/dependency-check-data
           key: ${{ runner.os }}-nvd-${{ hashFiles('pom.xml') }}
@@ -177,7 +177,7 @@ jobs:
 
       - name: Subir reporte OWASP (HTML)
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: owasp-dependency-check
           path: target/dependency-check-report.html
@@ -198,13 +198,13 @@ jobs:
       IMAGEN: ghcr.io/${{ github.repository }}/medicitas-api
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Configurar Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v4
 
       - name: Login en GHCR
-        uses: docker/login-action@v3
+        uses: docker/login-action@v4
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
@@ -212,7 +212,7 @@ jobs:
 
       # Construir cargando en el daemon local (load), SIN publicar todavia
       - name: Construir imagen (load, sin push)
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           load: true
@@ -221,7 +221,7 @@ jobs:
 
       # Escanear la imagen local ANTES de publicarla
       - name: Escaneo de imagen con Trivy
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@v0.36.0
         with:
           image-ref: ${{ env.IMAGEN }}:${{ github.sha }}
           format: table
@@ -254,7 +254,7 @@ jobs:
       IMAGEN: ghcr.io/${{ github.repository }}/medicitas-api
     steps:
       - name: Checkout (2 commits para resolver HEAD~1)
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 2
 
