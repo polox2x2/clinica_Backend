@@ -73,12 +73,13 @@ jobs:
         run: mvn -B verify -Pintegration
 
       - name: Publicar reporte de pruebas
-        uses: dorny/test-reporter@v1
+        uses: dorny/test-reporter@v2
         if: always()
         with:
           name: Reporte de pruebas
           path: "target/surefire-reports/*.xml,target/failsafe-reports/*.xml"
           reporter: java-junit
+          fail-on-error: false    # el reporte es informativo: nunca debe tumbar el build
 
       - name: Comentar cobertura en el PR
         if: github.event_name == 'pull_request'
@@ -95,6 +96,8 @@ jobs:
   calidad:
     name: Analisis de calidad
     needs: pruebas
+    # Los PRs de Dependabot no tienen acceso a los secrets (SONAR_*): se omite
+    if: github.actor != 'dependabot[bot]'
     runs-on: ubuntu-latest
     permissions:
       contents: read
