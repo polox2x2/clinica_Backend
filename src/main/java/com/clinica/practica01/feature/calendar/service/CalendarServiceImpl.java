@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.temporal.TemporalAdjusters;
 import java.util.HashMap;
 import java.util.List;
@@ -62,7 +63,7 @@ public class CalendarServiceImpl implements CalendarService {
     @Transactional(readOnly = true)
     public List<CalendarEvent> getToday(UUID doctorId) {
         List<Schedule> schedules = scheduleRepository
-                .findByDoctorIdAndAvailableDateAndActiveTrue(doctorId, LocalDate.now());
+                .findByDoctorIdAndAvailableDateAndActiveTrue(doctorId, LocalDate.now(ZoneId.systemDefault()));
         return toEvents(schedules).stream()
                 .filter(e -> e.getAppointmentId() != null)
                 .toList();

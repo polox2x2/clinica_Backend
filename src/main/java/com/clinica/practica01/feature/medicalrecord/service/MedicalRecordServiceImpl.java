@@ -42,12 +42,12 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
         Patient patient = patientRepository.findById(request.getPatientId())
                 .orElseThrow(() -> new ResourceNotFoundException("Paciente no encontrado"));
 
-        MedicalRecord record = recordRepository.findByPatientId(patient.getId())
+        MedicalRecord medicalRecord = recordRepository.findByPatientId(patient.getId())
                 .orElseGet(() -> recordRepository.save(
                         MedicalRecord.builder().patient(patient).build()));
 
         MedicalRecordEntry entry = MedicalRecordEntry.builder()
-                .record(record)
+                .medicalRecord(medicalRecord)
                 .doctor(doctor)
                 .reason(request.getReason())
                 .diagnosis(request.getDiagnosis())
@@ -63,26 +63,7 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
     @Override
     @Transactional(readOnly = true)
     public MedicalRecordResponse getByPatient(UUID patientId) {
-        MedicalRecord record = recordRepository.findByPatientId(patientId)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "El paciente no tiene historia clinica todavia"));
-        List<MedicalRecordEntryResponse> entries =
-                entryRepository.findByRecordIdAndActiveTrueOrderByCreatedAtDesc(record.getId())
-                        .stream().map(this::toEntryResponse).toList();
-
-        String patientName = record.getPatient().getUser() != null
-                ? record.getPatient().getUser().getFirstName() + " "
-                        + record.getPatient().getUser().getLastName()
-                : null;
-
-        return MedicalRecordResponse.builder()
-                .id(record.getId())
-                .patientId(record.getPatient().getId())
-                .patientName(patientName)
-                .allergies(record.getAllergies())
-                .bloodType(record.getBloodType())
-                .entries(entries)
-                .build();
+        return loadByPatient(patientId);
     }
 
     @Override
@@ -92,7 +73,32 @@ public class MedicalRecordServiceImpl implements MedicalRecordService {
                 .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
         var patient = patientRepository.findByUserId(user.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("No tienes perfil de paciente"));
-        return getByPatient(patient.getId());
+        // Llamada directa al metodo privado (no via 'this' a otro metodo @Transactional),
+        // corre dentro de la transaccion readOnly ya abierta por getMine.
+        return loadByPatient(patient.getId());
+    }
+
+    private MedicalRecordResponse loadByPatient(UUID patientId) {
+        MedicalRecord medicalRecord = recordRepository.findByPatientId(patientId)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "El paciente no tiene historia clinica todavia"));
+        List<MedicalRecordEntryResponse> entries =
+                entryRepository.findByMedicalRecordIdAndActiveTrueOrderByCreatedAtDesc(medicalRecord.getId())
+                        .stream().map(this::toEntryResponse).toList();
+
+        String patientName = medicalRecord.getPatient().getUser() != null
+                ? medicalRecord.getPatient().getUser().getFirstName() + " "
+                        + medicalRecord.getPatient().getUser().getLastName()
+                : null;
+
+        return MedicalRecordResponse.builder()
+                .id(medicalRecord.getId())
+                .patientId(medicalRecord.getPatient().getId())
+                .patientName(patientName)
+                .allergies(medicalRecord.getAllergies())
+                .bloodType(medicalRecord.getBloodType())
+                .entries(entries)
+                .build();
     }
 
     private Doctor currentDoctor(String username) {

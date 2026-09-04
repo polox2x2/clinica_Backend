@@ -72,14 +72,11 @@ public class ScheduleServiceImpl
              !date.isAfter(request.getToDate());
              date = date.plusDays(1)) {
 
-            if (isAbsent(date, absences)) {
-                continue;
-            }
             DoctorAvailability avail = byDay.get(date.getDayOfWeek());
-            if (avail == null) {
-                continue; // no trabaja ese dia
+            // Solo genera si el medico trabaja ese dia (avail != null) y no esta ausente.
+            if (avail != null && !isAbsent(date, absences)) {
+                generated += generateDay(doctor, date, avail);
             }
-            generated += generateDay(doctor, date, avail);
         }
         if (generated > 0) {
             calendarNotifier.calendarChanged(doctor.getId(), "SLOTS_GENERATED");

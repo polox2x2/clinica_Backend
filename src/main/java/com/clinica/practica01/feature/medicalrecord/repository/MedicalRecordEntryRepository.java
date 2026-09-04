@@ -7,5 +7,5 @@ import java.util.List;
 import java.util.UUID;
 
 public interface MedicalRecordEntryRepository extends BaseRepository<MedicalRecordEntry> {
-    List<MedicalRecordEntry> findByRecordIdAndActiveTrueOrderByCreatedAtDesc(UUID recordId);
+    List<MedicalRecordEntry> findByMedicalRecordIdAndActiveTrueOrderByCreatedAtDesc(UUID recordId);
 }

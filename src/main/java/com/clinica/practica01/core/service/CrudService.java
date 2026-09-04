@@ -10,16 +10,16 @@ import java.util.UUID;
  * extendiendo esta (ej. UserService extends CrudService&lt;UserRequest, UserResponse&gt;),
  * y su *ServiceImpl la implementa via AbstractCrudService.
  */
-public interface CrudService<Req, Res> {
+public interface CrudService<Q, R> {
 
-    Res create(Req request);
+    R create(Q request);
 
-    Res findById(UUID id);
+    R findById(UUID id);
 
-    Res update(UUID id, Req request);
+    R update(UUID id, Q request);
 
     /** Borrado logico. */
     void delete(UUID id);
 
-    PagedResponse<Res> search(SearchParams params);
+    PagedResponse<R> search(SearchParams params);
 }

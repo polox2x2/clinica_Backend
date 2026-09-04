@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
 import java.util.Date;
 import java.util.function.Function;
 
@@ -27,11 +28,12 @@ public class JwtService {
     }
 
     public String generateToken(UserDetails user) {
-        Date now = new Date();
+        Instant now = Instant.now();
+        // jjwt trabaja con java.util.Date; el calculo de tiempos usa java.time.
         return Jwts.builder()
                 .subject(user.getUsername())
-                .issuedAt(now)
-                .expiration(new Date(now.getTime() + expirationMs))
+                .issuedAt(Date.from(now))
+                .expiration(Date.from(now.plusMillis(expirationMs)))
                 .signWith(key())
                 .compact();
     }
@@ -50,7 +52,7 @@ public class JwtService {
     }
 
     private boolean isExpired(String token) {
-        return extractClaim(token, Claims::getExpiration).before(new Date());
+        return extractClaim(token, Claims::getExpiration).toInstant().isBefore(Instant.now());
     }
 
     private <T> T extractClaim(String token, Function<Claims, T> resolver) {

@@ -7,7 +7,6 @@ import com.clinica.practica01.core.security.PermissionChecker;
 import com.clinica.practica01.core.service.CrudService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,12 +25,12 @@ import java.util.UUID;
  * (no de la implementacion). Cada feature lo extiende con su @RestController +
  * @RequestMapping y el prefijo de permiso.
  */
-public abstract class BaseCrudController<Req, Res extends BaseResponse> {
+public abstract class BaseCrudController<Q, R extends BaseResponse> {
 
-    protected final CrudService<Req, Res> service;
+    protected final CrudService<Q, R> service;
     protected final PermissionChecker permissions;
 
-    protected BaseCrudController(CrudService<Req, Res> service, PermissionChecker permissions) {
+    protected BaseCrudController(CrudService<Q, R> service, PermissionChecker permissions) {
         this.service = service;
         this.permissions = permissions;
     }
@@ -41,50 +40,42 @@ public abstract class BaseCrudController<Req, Res extends BaseResponse> {
 
     @Operation(summary = "Crear registro",
             description = "Crea un nuevo registro. Requiere el permiso <Entidad>:Create.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "Creado"),
-            @ApiResponse(responseCode = "400", description = "Datos invalidos"),
-            @ApiResponse(responseCode = "403", description = "Sin permiso")
-    })
+    @ApiResponse(responseCode = "201", description = "Creado")
+    @ApiResponse(responseCode = "400", description = "Datos invalidos")
+    @ApiResponse(responseCode = "403", description = "Sin permiso")
     @PostMapping
-    public ResponseEntity<Res> create(@Valid @RequestBody Req request) {
+    public ResponseEntity<R> create(@Valid @RequestBody Q request) {
         permissions.require(permissionPrefix() + ":Create");
         return ResponseEntity.status(HttpStatus.CREATED).body(service.create(request));
     }
 
     @Operation(summary = "Obtener por id",
             description = "Devuelve un registro activo por su UUID. Requiere <Entidad>:Read.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Encontrado"),
-            @ApiResponse(responseCode = "404", description = "No encontrado"),
-            @ApiResponse(responseCode = "403", description = "Sin permiso")
-    })
+    @ApiResponse(responseCode = "200", description = "Encontrado")
+    @ApiResponse(responseCode = "404", description = "No encontrado")
+    @ApiResponse(responseCode = "403", description = "Sin permiso")
     @GetMapping("/{id}")
-    public ResponseEntity<Res> getById(@PathVariable UUID id) {
+    public ResponseEntity<R> getById(@PathVariable UUID id) {
         permissions.require(permissionPrefix() + ":Read");
         return ResponseEntity.ok(service.findById(id));
     }
 
     @Operation(summary = "Actualizar registro",
             description = "Actualiza un registro existente. Requiere <Entidad>:Update.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Actualizado"),
-            @ApiResponse(responseCode = "404", description = "No encontrado"),
-            @ApiResponse(responseCode = "403", description = "Sin permiso")
-    })
+    @ApiResponse(responseCode = "200", description = "Actualizado")
+    @ApiResponse(responseCode = "404", description = "No encontrado")
+    @ApiResponse(responseCode = "403", description = "Sin permiso")
     @PutMapping("/{id}")
-    public ResponseEntity<Res> update(@PathVariable UUID id, @Valid @RequestBody Req request) {
+    public ResponseEntity<R> update(@PathVariable UUID id, @Valid @RequestBody Q request) {
         permissions.require(permissionPrefix() + ":Update");
         return ResponseEntity.ok(service.update(id, request));
     }
 
     @Operation(summary = "Eliminar (borrado logico)",
             description = "Marca el registro como inactivo (no lo borra fisicamente). Requiere <Entidad>:Delete.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "204", description = "Eliminado"),
-            @ApiResponse(responseCode = "404", description = "No encontrado"),
-            @ApiResponse(responseCode = "403", description = "Sin permiso")
-    })
+    @ApiResponse(responseCode = "204", description = "Eliminado")
+    @ApiResponse(responseCode = "404", description = "No encontrado")
+    @ApiResponse(responseCode = "403", description = "Sin permiso")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable UUID id) {
         permissions.require(permissionPrefix() + ":Delete");
@@ -95,12 +86,10 @@ public abstract class BaseCrudController<Req, Res extends BaseResponse> {
     @Operation(summary = "Listar (busqueda paginada)",
             description = "Lista paginada con parametros search, sortBy, sortDirection, page, pageSize. "
                     + "Devuelve el envelope estandar (items, totalCount, hasNextPage...). Requiere <Entidad>:List.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Pagina de resultados"),
-            @ApiResponse(responseCode = "403", description = "Sin permiso")
-    })
+    @ApiResponse(responseCode = "200", description = "Pagina de resultados")
+    @ApiResponse(responseCode = "403", description = "Sin permiso")
     @GetMapping
-    public ResponseEntity<PagedResponse<Res>> list(SearchParams params) {
+    public ResponseEntity<PagedResponse<R>> list(SearchParams params) {
         permissions.require(permissionPrefix() + ":List");
         return ResponseEntity.ok(service.search(params));
     }

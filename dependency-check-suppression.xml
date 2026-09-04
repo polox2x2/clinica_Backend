@@ -16,4 +16,24 @@
         ]]></notes>
         <packageUrl regex="true">^pkg:maven/org\.springframework\.boot/spring-boot-devtools@.*$</packageUrl>
     </suppress>
+
+    <!--
+        DOMPurify va empaquetado (JS) DENTRO del jar de swagger-ui, que a su vez
+        entra por springdoc-openapi-starter-webmvc-ui. Swagger UI y /v3/api-docs
+        estan DESACTIVADOS en produccion (ver application-prod.yaml:
+        springdoc.api-docs.enabled=false y springdoc.swagger-ui.enabled=false),
+        por lo que este JS nunca se sirve en el desplegable y la XSS del lado
+        cliente no es alcanzable en prod.
+
+        Fix duradero: subir springdoc a una version que empaquete un swagger-ui
+        con DOMPurify parcheado. Mientras tanto se suprime solo este CVE sobre el
+        artefacto DOMPurify (no todo swagger-ui) para mantener estricto el gate.
+    -->
+    <suppress>
+        <notes><![CDATA[
+            DOMPurify empaquetado en swagger-ui; Swagger deshabilitado en produccion.
+        ]]></notes>
+        <packageUrl regex="true">^pkg:javascript/DOMPurify@.*$</packageUrl>
+        <cve>CVE-2026-75838</cve>
+    </suppress>
 </suppressions>

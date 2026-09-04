@@ -19,7 +19,7 @@ public class PermissionChecker {
             return false;
         }
         for (GrantedAuthority ga : auth.getAuthorities()) {
-            if (ga.getAuthority().equals(permission)) {
+            if (permission.equals(ga.getAuthority())) {
                 return true;
             }
         }

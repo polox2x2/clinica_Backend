@@ -43,6 +43,8 @@ public class DataBootstrap implements CommandLineRunner {
             "Product", "StockEntry", "Order",
             "Availability", "Absence", "Calendar");
     private static final List<String> ACTIONS = List.of("Create", "Read", "Update", "Delete", "List");
+    private static final String PERM_APPOINTMENT_LIST = "Appointment:List";
+    private static final String PERM_SCHEDULE_LIST = "Schedule:List";
 
     @Override
     @Transactional
@@ -51,15 +53,15 @@ public class DataBootstrap implements CommandLineRunner {
 
         Role admin = seedRole("Admin", "Acceso total", new HashSet<>(permissions.values()));
         seedRole("Medico", "Personal medico", pick(permissions,
-                "Appointment:List", "Appointment:Read", "Appointment:Update",
-                "Schedule:Create", "Schedule:Read", "Schedule:Update", "Schedule:Delete", "Schedule:List",
+                PERM_APPOINTMENT_LIST, "Appointment:Read", "Appointment:Update",
+                "Schedule:Create", "Schedule:Read", "Schedule:Update", "Schedule:Delete", PERM_SCHEDULE_LIST,
                 "Patient:Read", "Patient:List",
                 "Availability:Read", "Availability:List", "Absence:Read", "Absence:List", "Absence:Create",
                 "Calendar:Read", "Calendar:List",
                 "MedicalRecord:Create", "MedicalRecord:Read", "MedicalRecord:List"));
         seedRole("Paciente", "Rol por defecto de pacientes", pick(permissions,
-                "Appointment:Create", "Appointment:Read", "Appointment:List",
-                "Doctor:List", "Speciality:List", "Schedule:List",
+                "Appointment:Create", "Appointment:Read", PERM_APPOINTMENT_LIST,
+                "Doctor:List", "Speciality:List", PERM_SCHEDULE_LIST,
                 "MedicalRecord:Read"));
         // Rol dinamico de ejemplo para la farmacia (el admin puede crear mas)
         seedRole("Caja", "Caja / farmacia", pick(permissions,
@@ -132,11 +134,11 @@ public class DataBootstrap implements CommandLineRunner {
         menuRepository.save(menuItem("Especialidades", "activity", "/dashboard/especialidades", 1, "Speciality:List", gestion));
         menuRepository.save(menuItem("Medicos", "stethoscope", "/dashboard/medicos", 2, "Doctor:List", gestion));
         menuRepository.save(menuItem("Pacientes", "user-round", "/dashboard/pacientes", 3, "Patient:List", gestion));
-        menuRepository.save(menuItem("Horarios", "calendar", "/dashboard/horarios", 4, "Schedule:List", gestion));
+        menuRepository.save(menuItem("Horarios", "calendar", "/dashboard/horarios", 4, PERM_SCHEDULE_LIST, gestion));
         menuRepository.save(menuItem("Disponibilidad", "clock", "/dashboard/disponibilidad", 7, "Availability:List", gestion));
         menuRepository.save(menuItem("Ausencias", "calendar-off", "/dashboard/ausencias", 8, "Absence:List", gestion));
         menuRepository.save(menuItem("Agenda Medica", "calendar-days", "/dashboard/agenda", 9, "Calendar:Read", gestion));
-        menuRepository.save(menuItem("Citas", "calendar-check", "/dashboard/citas", 5, "Appointment:List", gestion));
+        menuRepository.save(menuItem("Citas", "calendar-check", "/dashboard/citas", 5, PERM_APPOINTMENT_LIST, gestion));
         menuRepository.save(menuItem("Historias Clinicas", "file-text", "/dashboard/historias", 6, "MedicalRecord:List", gestion));
 
         Menu farmacia = menuRepository.save(Menu.builder()
