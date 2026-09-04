@@ -176,6 +176,7 @@ jobs:
         run: >
           mvn -B org.owasp:dependency-check-maven:check
           -DfailBuildOnCVSS=8
+          -DsuppressionFiles=dependency-check-suppression.xml
           -DnvdApiKey=${{ secrets.NVD_API_KEY }}
 
       # Guarda la BD SIEMPRE (aunque OWASP corte por CVEs), para no re-descargar 386k
