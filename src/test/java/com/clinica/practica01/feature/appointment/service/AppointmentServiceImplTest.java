@@ -23,7 +23,6 @@ import com.clinica.practica01.feature.user.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
@@ -40,6 +39,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -60,14 +60,14 @@ class AppointmentServiceImplTest {
 
     AppointmentServiceImpl service;
 
-    private final AppointmentResponse RESP = new AppointmentResponse();
+    private final AppointmentResponse response = new AppointmentResponse();
 
     @BeforeEach
     void setUp() {
         service = new AppointmentServiceImpl(appointmentRepository, mapper, scheduleRepository,
                 patientRepository, userRepository, doctorRepository, notifier, calendarNotifier,
                 medicalRecordService, permissions);
-        lenient().when(mapper.toResponseWithBase(any())).thenReturn(RESP);
+        lenient().when(mapper.toResponseWithBase(any())).thenReturn(response);
         lenient().when(appointmentRepository.save(any())).thenAnswer(i -> i.getArgument(0));
         lenient().when(scheduleRepository.save(any())).thenAnswer(i -> i.getArgument(0));
     }
@@ -122,7 +122,7 @@ class AppointmentServiceImplTest {
         when(patientRepository.findByUserId(pu.getId())).thenReturn(Optional.of(p));
         when(scheduleRepository.findById(s.getId())).thenReturn(Optional.of(s));
 
-        assertThat(service.book(req, "pat")).isSameAs(RESP);
+        assertThat(service.book(req, "pat")).isSameAs(response);
         assertThat(s.isBooked()).isTrue();
         verify(appointmentRepository).save(any(Appointment.class));
         verify(notifier).notifyUser(anyString(), any());
@@ -138,7 +138,7 @@ class AppointmentServiceImplTest {
         when(patientRepository.findById(p.getId())).thenReturn(Optional.of(p));
         when(scheduleRepository.findById(s.getId())).thenReturn(Optional.of(s));
 
-        assertThat(service.book(req, "admin")).isSameAs(RESP);
+        assertThat(service.book(req, "admin")).isSameAs(response);
     }
 
     @Test
@@ -184,7 +184,8 @@ class AppointmentServiceImplTest {
     void confirm_throws_whenNotPending() {
         Appointment a = appt(patient(user("pat")), futureSlot(doctor(user("doc")), true), AppointmentStatus.CONFIRMED);
         when(appointmentRepository.findById(a.getId())).thenReturn(Optional.of(a));
-        assertThatThrownBy(() -> service.confirm(a.getId())).isInstanceOf(BusinessException.class);
+        UUID appointmentId = a.getId();
+        assertThatThrownBy(() -> service.confirm(appointmentId)).isInstanceOf(BusinessException.class);
     }
 
     @Test
@@ -227,7 +228,9 @@ class AppointmentServiceImplTest {
     void reschedule_throws_whenStatusInvalid() {
         Appointment a = appt(patient(user("pat")), futureSlot(doctor(user("doc")), true), AppointmentStatus.COMPLETED);
         when(appointmentRepository.findById(a.getId())).thenReturn(Optional.of(a));
-        assertThatThrownBy(() -> service.reschedule(a.getId(), UUID.randomUUID()))
+        UUID appointmentId = a.getId();
+        UUID scheduleId = UUID.randomUUID();
+        assertThatThrownBy(() -> service.reschedule(appointmentId, scheduleId))
                 .isInstanceOf(BusinessException.class);
     }
 
@@ -258,7 +261,7 @@ class AppointmentServiceImplTest {
         service.complete(a.getId(), new CompleteAppointmentRequest(), "admin");
 
         assertThat(a.getStatus()).isEqualTo(AppointmentStatus.COMPLETED);
-        verify(medicalRecordService, org.mockito.Mockito.never()).addEntry(any(), any());
+        verify(medicalRecordService, never()).addEntry(any(), any());
     }
 
     // ---- mine ----
@@ -314,7 +317,8 @@ class AppointmentServiceImplTest {
         when(appointmentRepository.findById(a.getId())).thenReturn(Optional.of(a));
         when(permissions.has("Appointment:Update")).thenReturn(false);
 
-        assertThatThrownBy(() -> service.cancel(a.getId(), "someoneElse"))
+        UUID appointmentId = a.getId();
+        assertThatThrownBy(() -> service.cancel(appointmentId, "someoneElse"))
                 .isInstanceOf(BusinessException.class);
     }
 
@@ -325,7 +329,8 @@ class AppointmentServiceImplTest {
         when(appointmentRepository.findById(a.getId())).thenReturn(Optional.of(a));
         when(permissions.has("Appointment:Update")).thenReturn(true);
 
-        assertThatThrownBy(() -> service.cancel(a.getId(), "admin"))
+        UUID appointmentId = a.getId();
+        assertThatThrownBy(() -> service.cancel(appointmentId, "admin"))
                 .isInstanceOf(BusinessException.class);
     }
 }
