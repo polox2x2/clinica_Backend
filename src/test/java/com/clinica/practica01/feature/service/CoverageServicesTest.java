@@ -170,8 +170,8 @@ class CoverageServicesTest {
 
     @Test
     void doctorCreateAndUpdate_coverUserAndNoUser() {
-        DoctorRepository repository = mock(DoctorRepository.class); DoctorMapper mapper = mock(DoctorMapper.class); AccountProvisioner provisioner = mock(AccountProvisioner.class);
-        DoctorServiceImpl service = new DoctorServiceImpl(repository, mapper, provisioner); DoctorRequest request = new DoctorRequest();
+        DoctorRepository repository = mock(DoctorRepository.class); DoctorMapper mapper = mock(DoctorMapper.class); AccountProvisioner provisioner = mock(AccountProvisioner.class); UserRepository users = mock(UserRepository.class);
+        DoctorServiceImpl service = new DoctorServiceImpl(repository, mapper, provisioner, users); DoctorRequest request = new DoctorRequest();
         request.setFirstName("Doc"); request.setLastName("Tor"); request.setEmail("d@x.test"); request.setPassword("pw");
         User user = new User(); Doctor doctor = new Doctor(); when(provisioner.create(any(), any(), any(), any(), eq("Medico"))).thenReturn(user);
         when(mapper.toEntity(request)).thenReturn(doctor); when(repository.save(any())).thenAnswer(i -> i.getArgument(0));

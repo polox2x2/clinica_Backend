@@ -7,6 +7,7 @@ import com.clinica.practica01.feature.doctor.entity.Doctor;
 import com.clinica.practica01.feature.doctor.mapper.DoctorMapper;
 import com.clinica.practica01.feature.doctor.repository.DoctorRepository;
 import com.clinica.practica01.feature.user.entity.User;
+import com.clinica.practica01.feature.user.repository.UserRepository;
 import com.clinica.practica01.feature.user.service.AccountProvisioner;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,11 +23,28 @@ public class DoctorServiceImpl
     private static final String DOCTOR_ROLE = "Medico";
 
     private final AccountProvisioner accountProvisioner;
+    private final UserRepository userRepository;
+    private final DoctorRepository doctorRepository;
 
     public DoctorServiceImpl(DoctorRepository repository, DoctorMapper mapper,
-                             AccountProvisioner accountProvisioner) {
+                             AccountProvisioner accountProvisioner, UserRepository userRepository) {
         super(repository, mapper);
+        this.doctorRepository = repository;
         this.accountProvisioner = accountProvisioner;
+        this.userRepository = userRepository;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public DoctorResponse getMe(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new com.clinica.practica01.core.exception.ResourceNotFoundException(
+                        "Usuario no encontrado"));
+        Doctor doctor = doctorRepository.findByUserId(user.getId())
+                .filter(Doctor::isActive)
+                .orElseThrow(() -> new com.clinica.practica01.core.exception.ResourceNotFoundException(
+                        "No tienes perfil de medico"));
+        return mapper.toResponseWithBase(doctor);
     }
 
     @Override

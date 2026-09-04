@@ -53,10 +53,13 @@ public class MenuServiceImpl
         List<MenuNode> result = new ArrayList<>();
         for (Menu m : byParent.getOrDefault(parentId, List.of())) {
             List<MenuNode> children = buildChildren(m.getId(), byParent, perms);
+            boolean isGroup = m.getRoute() == null; // agrupador sin navegacion propia (ej. "Seguridad")
             boolean permitted = m.getRequiredPermission() == null
                     || perms.contains(m.getRequiredPermission());
-            // Se muestra si el usuario tiene el permiso, o si tiene hijos visibles.
-            if (permitted || !children.isEmpty()) {
+            // Un grupo solo se muestra si tiene hijos visibles (no basta con no requerir permiso).
+            // Un item con ruta se muestra si el usuario tiene el permiso, o si tiene hijos visibles.
+            boolean show = isGroup ? !children.isEmpty() : (permitted || !children.isEmpty());
+            if (show) {
                 result.add(MenuNode.builder()
                         .id(m.getId())
                         .label(m.getLabel())
