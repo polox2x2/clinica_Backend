@@ -17,7 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class OrderMapperTest {
 
     private final OrderMapper mapper = new OrderMapper();
-
+    // Test
     @Test
     void toEntity_initializesZeroTotal() {
         assertThat(mapper.toEntity(new OrderRequest()).getTotal()).isEqualByComparingTo("0");
