@@ -30,22 +30,34 @@ public class JwtHandshakeInterceptor implements HandshakeInterceptor {
                                    WebSocketHandler wsHandler, Map<String, Object> attributes) {
         if (request instanceof ServletServerHttpRequest servletRequest) {
             Cookie[] cookies = servletRequest.getServletRequest().getCookies();
-            if (cookies != null) {
-                for (Cookie cookie : cookies) {
-                    if (cookieService.getCookieName().equals(cookie.getName())) {
-                        try {
-                            String username = jwtService.extractUsername(cookie.getValue());
-                            if (username != null) {
-                                attributes.put("username", username);
-                            }
-                        } catch (Exception ignored) {
-                            // token invalido -> handshake sin principal
-                        }
-                    }
-                }
+            String username = extractUsernameFromCookies(cookies);
+            if (username != null) {
+                attributes.put("username", username);
             }
         }
         return true; // se permite el handshake; sin username no recibe mensajes de usuario
+    }
+
+    /** Busca la cookie del JWT y devuelve el username, o null si no hay token valido. */
+    private String extractUsernameFromCookies(Cookie[] cookies) {
+        if (cookies == null) {
+            return null;
+        }
+        for (Cookie cookie : cookies) {
+            if (cookieService.getCookieName().equals(cookie.getName())) {
+                return safeExtractUsername(cookie.getValue());
+            }
+        }
+        return null;
+    }
+
+    private String safeExtractUsername(String token) {
+        try {
+            return jwtService.extractUsername(token);
+        } catch (Exception ignored) {
+            // token invalido -> handshake sin principal
+            return null;
+        }
     }
 
     @Override

@@ -22,13 +22,13 @@ import java.util.UUID;
  * Implementacion CRUD generica (borrado logico + busqueda + paginacion).
  * Los *ServiceImpl de cada feature la extienden e implementan su interface XService.
  */
-public abstract class AbstractCrudService<E extends BaseEntity, Req, Res extends BaseResponse>
-        implements CrudService<Req, Res> {
+public abstract class AbstractCrudService<E extends BaseEntity, Q, R extends BaseResponse>
+        implements CrudService<Q, R> {
 
     protected final BaseRepository<E> repository;
-    protected final BaseMapper<E, Req, Res> mapper;
+    protected final BaseMapper<E, Q, R> mapper;
 
-    protected AbstractCrudService(BaseRepository<E> repository, BaseMapper<E, Req, Res> mapper) {
+    protected AbstractCrudService(BaseRepository<E> repository, BaseMapper<E, Q, R> mapper) {
         this.repository = repository;
         this.mapper = mapper;
     }
@@ -42,19 +42,19 @@ public abstract class AbstractCrudService<E extends BaseEntity, Req, Res extends
     }
 
     @Override
-    public Res create(Req request) {
+    public R create(Q request) {
         E entity = mapper.toEntity(request);
         entity.setActive(true);
         return mapper.toResponseWithBase(repository.save(entity));
     }
 
     @Override
-    public Res findById(UUID id) {
+    public R findById(UUID id) {
         return mapper.toResponseWithBase(getActiveOrThrow(id));
     }
 
     @Override
-    public Res update(UUID id, Req request) {
+    public R update(UUID id, Q request) {
         E entity = getActiveOrThrow(id);
         mapper.updateEntity(entity, request);
         return mapper.toResponseWithBase(repository.save(entity));
@@ -68,7 +68,7 @@ public abstract class AbstractCrudService<E extends BaseEntity, Req, Res extends
     }
 
     @Override
-    public PagedResponse<Res> search(SearchParams params) {
+    public PagedResponse<R> search(SearchParams params) {
         Sort sort = buildSort(params);
         Pageable pageable = PageRequest.of(params.safePage() - 1, params.safePageSize(), sort);
         Page<E> page = repository.findAll(buildSpecification(params.getSearch()), pageable);

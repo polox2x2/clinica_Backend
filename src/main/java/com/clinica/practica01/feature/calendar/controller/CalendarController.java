@@ -19,6 +19,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.UUID;
 
@@ -78,7 +79,7 @@ public class CalendarController {
     }
 
     private LocalDate orToday(LocalDate date) {
-        return date != null ? date : LocalDate.now();
+        return date != null ? date : LocalDate.now(ZoneId.systemDefault());
     }
 
     private UUID currentDoctorId(String username) {

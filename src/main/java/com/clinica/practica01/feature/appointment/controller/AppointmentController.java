@@ -29,6 +29,7 @@ import java.util.UUID;
 public class AppointmentController {
 
     private static final String PREFIX = "Appointment";
+    private static final String PERM_UPDATE = PREFIX + ":Update";
 
     private final AppointmentService service;
     private final PermissionChecker permissions;
@@ -61,7 +62,7 @@ public class AppointmentController {
             description = "PENDING -> CONFIRMED. Notifica al paciente. Medico/admin (Appointment:Update).")
     @PatchMapping("/{id}/confirm")
     public ResponseEntity<AppointmentResponse> confirm(@PathVariable UUID id) {
-        permissions.require(PREFIX + ":Update");
+        permissions.require(PERM_UPDATE);
         return ResponseEntity.ok(service.confirm(id));
     }
 
@@ -69,7 +70,7 @@ public class AppointmentController {
             description = "PENDING -> REJECTED, libera la franja. Notifica al paciente. (Appointment:Update).")
     @PatchMapping("/{id}/reject")
     public ResponseEntity<AppointmentResponse> reject(@PathVariable UUID id) {
-        permissions.require(PREFIX + ":Update");
+        permissions.require(PERM_UPDATE);
         return ResponseEntity.ok(service.reject(id));
     }
 
@@ -78,7 +79,7 @@ public class AppointmentController {
     @PatchMapping("/{id}/reschedule")
     public ResponseEntity<AppointmentResponse> reschedule(@PathVariable UUID id,
                                                           @Valid @RequestBody RescheduleRequest request) {
-        permissions.require(PREFIX + ":Update");
+        permissions.require(PERM_UPDATE);
         return ResponseEntity.ok(service.reschedule(id, request.getNewScheduleId()));
     }
 
@@ -89,7 +90,7 @@ public class AppointmentController {
     public ResponseEntity<AppointmentResponse> complete(@PathVariable UUID id,
                                                         @RequestBody CompleteAppointmentRequest request,
                                                         Authentication auth) {
-        permissions.require(PREFIX + ":Update");
+        permissions.require(PERM_UPDATE);
         return ResponseEntity.ok(service.complete(id, request, auth.getName()));
     }
 
@@ -97,7 +98,7 @@ public class AppointmentController {
             description = "CONFIRMED -> NO_SHOW. Medico (Appointment:Update).")
     @PatchMapping("/{id}/no-show")
     public ResponseEntity<AppointmentResponse> noShow(@PathVariable UUID id) {
-        permissions.require(PREFIX + ":Update");
+        permissions.require(PERM_UPDATE);
         return ResponseEntity.ok(service.noShow(id));
     }
 

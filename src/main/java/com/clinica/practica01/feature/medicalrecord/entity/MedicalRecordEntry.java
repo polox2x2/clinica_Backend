@@ -18,7 +18,7 @@ public class MedicalRecordEntry extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "record_id", nullable = false)
-    private MedicalRecord record;
+    private MedicalRecord medicalRecord;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "doctor_id", nullable = false)
