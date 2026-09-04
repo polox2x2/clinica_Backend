@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd">
+    <!--
+        spring-boot-devtools es una dependencia SOLO de desarrollo: esta declarada
+        como optional + runtime (ver pom.xml) y Spring Boot la excluye del jar
+        empaquetado y de produccion. Los CVEs reportados sobre este artefacto no
+        llegan al artefacto desplegable, por lo que se suprimen aqui en lugar de
+        rebajar el umbral global -DfailBuildOnCVSS.
+
+        El regex sobre packageUrl cubre cualquier version, de modo que un futuro
+        bump del spring-boot-starter-parent no rompe esta supresion.
+    -->
+    <suppress>
+        <notes><![CDATA[
+            Dependencia dev-only (optional/runtime), no se empaqueta en el jar de produccion.
+        ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.springframework\.boot/spring-boot-devtools@.*$</packageUrl>
+    </suppress>
+</suppressions>
