@@ -15,6 +15,7 @@ import java.util.function.Function;
 
 /** Genera y valida JWT (HS256). */
 @Service
+@SuppressWarnings("java:S2143") // La API publica de JJWT 0.12 exige java.util.Date para los claims temporales.
 public class JwtService {
 
     @Value("${app.jwt.secret}")
@@ -27,7 +28,6 @@ public class JwtService {
         return Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
     }
 
-    @SuppressWarnings("java:S2143") // JJWT 0.12 expone issuedAt/expiration mediante java.util.Date.
     public String generateToken(UserDetails user) {
         Instant now = Instant.now();
         // jjwt trabaja con java.util.Date; el calculo de tiempos usa java.time.
