@@ -38,6 +38,9 @@
 		<testcontainers.version>2.0.5</testcontainers.version>
 		<!-- Consumido por SonarQube (job 'calidad') para leer la cobertura de JaCoCo -->
 		<sonar.coverage.jacoco.xmlReportPaths>${project.build.directory}/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
+		<!-- Mantiene el universo de cobertura de Sonar alineado con las exclusiones
+		     JaCoCo: clases declarativas/sin logica de negocio. -->
+		<sonar.coverage.exclusions>**/ClinicaApplication.java,**/config/**,**/dto/**,**/entity/**,**/*Request.java,**/*Response.java</sonar.coverage.exclusions>
 	</properties>
 	<dependencyManagement>
 		<dependencies>
@@ -131,14 +134,6 @@
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
-			<optional>true</optional>
-		</dependency>
-		<!-- Hot-reload en desarrollo local (auto-restart al recompilar).
-		     optional/devtools se excluye del jar empaquetado y de produccion. -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-devtools</artifactId>
-			<scope>runtime</scope>
 			<optional>true</optional>
 		</dependency>
 		<dependency>

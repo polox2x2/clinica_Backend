@@ -27,6 +27,7 @@ public class JwtService {
         return Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
     }
 
+    @SuppressWarnings("java:S2143") // JJWT 0.12 expone issuedAt/expiration mediante java.util.Date.
     public String generateToken(UserDetails user) {
         Instant now = Instant.now();
         // jjwt trabaja con java.util.Date; el calculo de tiempos usa java.time.
