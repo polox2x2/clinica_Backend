@@ -196,7 +196,16 @@
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
 				<version>${jacoco.version}</version>
-				<executions>
+				<configuration>
+					<excludes>
+						<exclude>**/ClinicaApplication.*</exclude>
+						<exclude>**/config/**</exclude>
+						<exclude>**/dto/**</exclude>
+						<exclude>**/entity/**</exclude>
+						<exclude>**/*Request.*</exclude>
+						<exclude>**/*Response.*</exclude>
+					</excludes>
+				</configuration>				<executions>
 					<execution>
 						<id>prepare-agent</id>
 						<goals>
