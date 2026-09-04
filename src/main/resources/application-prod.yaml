@@ -1,0 +1,11 @@
+# Perfil de PRODUCCION (SPRING_PROFILES_ACTIVE=prod).
+# Swagger DESACTIVADO en el desplegado (solo disponible en local).
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
+
+spring:
+  jpa:
+    show-sql: false

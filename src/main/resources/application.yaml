@@ -13,13 +13,26 @@ spring:
     driver-class-name: ${DB_DRIVER:com.mysql.cj.jdbc.Driver}
   jpa:
     hibernate:
-      # update en local; en prod conviene 'validate' (ver application-prod.yaml)
-      ddl-auto: ${JPA_DDL_AUTO:update}
-    show-sql: ${JPA_SHOW_SQL:true}
+      # Flyway administra el esquema; Hibernate solo valida que coincida.
+      ddl-auto: ${JPA_DDL_AUTO:validate}
+    show-sql: ${JPA_SHOW_SQL:false}
     properties:
       hibernate:
         format_sql: ${JPA_FORMAT_SQL:true}
         dialect: ${JPA_DIALECT:org.hibernate.dialect.MySQLDialect}
+  # Flyway administra las migraciones de esquema (src/main/resources/db/migration)
+  flyway:
+    enabled: ${FLYWAY_ENABLED:true}
+
+# Swagger / OpenAPI: habilitado en local, se apaga en prod (application-prod.yaml)
+springdoc:
+  api-docs:
+    enabled: ${SWAGGER_ENABLED:true}
+  swagger-ui:
+    enabled: ${SWAGGER_ENABLED:true}
+    path: /swagger-ui.html
+    operations-sorter: alpha
+    tags-sorter: alpha
 
 # Puerto del servidor (Railway suele inyectar PORT)
 server:
@@ -43,3 +56,17 @@ app:
     # Lista de origenes permitidos, separados por coma. Configurable por entorno.
     # Ej: CORS_ALLOWED_ORIGINS=https://app.midominio.com,https://admin.midominio.com
     allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173}
+  jwt:
+    # Clave HS256 (min 32 bytes). En prod usar JWT_SECRET como secret.
+    secret: ${JWT_SECRET:medicitas-dev-secret-key-change-me-please-0123456789}
+    expiration-ms: ${JWT_EXPIRATION_MS:86400000}
+  auth:
+    default-role: ${AUTH_DEFAULT_ROLE:Paciente}
+    cookie:
+      name: ${AUTH_COOKIE_NAME:access_token}
+      # En local: secure=false, SameSite=Lax. En prod cross-subdominio:
+      # secure=true, same-site=None (o domain=.lmart.dev con Lax).
+      secure: ${AUTH_COOKIE_SECURE:false}
+      same-site: ${AUTH_COOKIE_SAMESITE:Lax}
+      domain: ${AUTH_COOKIE_DOMAIN:}
+      max-age-seconds: ${AUTH_COOKIE_MAX_AGE:86400}
