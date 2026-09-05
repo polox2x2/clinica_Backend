@@ -81,7 +81,7 @@ jobs:
           # otro esquema y hace crashear al parser (reading '$').
           path: "target/surefire-reports/TEST-*.xml,target/failsafe-reports/TEST-*.xml"
           reporter: java-junit
-          fail-on-error: false    # el reporte es informativo: nunca debe tumbar el build
+          fail-on-error: false # el reporte es informativo: nunca debe tumbar el build
 
       - name: Comentar cobertura en el PR
         if: github.event_name == 'pull_request'
@@ -163,7 +163,7 @@ jobs:
           java-version: "21"
           cache: maven
 
-      # Restaura la BD de NVD cacheada (clave rotativa por run + fallback al prefijo)
+      # Restaura la BD de NVD cacheada (clave rotativa por run
       - name: Restaurar cache de la BD de NVD
         uses: actions/cache/restore@v4
         with:
